@@ -93,6 +93,33 @@ class Generator implements GeneratorInterface
         return bindec($bin);
     }
 
+    /**
+     * Returns the minimum id possible for the DateTime.
+     *
+     * @param \DateTimeInterface $dateTime
+     * @return int
+     */
+    public static function min(\DateTimeInterface $dateTime): int
+    {
+        $sequenceHolder = static::zeroSequenceHolder();
+        $workerId = new WorkerId(0);
+        $dataCenterId = new DataCenterId(0);
+        $instance = new static($sequenceHolder, $workerId, $dataCenterId);
+
+        return $instance->generate($dateTime);
+    }
+
+    private static function zeroSequenceHolder()
+    {
+        return new class implements SequenceHolderInterface
+        {
+            public function getCurrentSequence(\DateTimeInterface $dateTime): int
+            {
+                return 0;
+            }
+        };
+    }
+
     private function checkLength()
     {
         $totalLength = $this->timestampBitLength + $this->dataCenterIdBitLength + $this->workerIdBitLength + $this->sequenceBitLength;
